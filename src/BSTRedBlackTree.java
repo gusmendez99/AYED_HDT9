@@ -1,14 +1,14 @@
-public class RedBlackTreeMap<K extends Comparable<K>,V> {
-    protected BinarySearchTree<RBTEntry<K,V>> tree;
+public class BSTRedBlackTree<K extends Comparable<K>,V>  {
+    protected BinarySearchTree<RedBlackTreeAssociation<K,V>> tree;
 
-    public RedBlackTreeMap()
+    public BSTRedBlackTree()
     {
         tree = new BinarySearchTree<>();
     }
 
     public V put(K key, V value)
     {
-        RBTEntry<K,V> prev = tree.add(new RBTEntry<>(key, value, true));
+        RedBlackTreeAssociation<K,V> prev = tree.add(new RedBlackTreeAssociation<>(key, value, true));
         // restructure tree
         insertRestructure(tree.actionNode);
         if(prev == null) return null;
@@ -17,14 +17,14 @@ public class RedBlackTreeMap<K extends Comparable<K>,V> {
 
     public V remove(K key)
     {
-        RBTEntry<K,V> prev = tree.remove(new RBTEntry<>(key, null, false));
+        RedBlackTreeAssociation<K,V> prev = tree.remove(new RedBlackTreeAssociation<>(key, null, false));
         if(prev == null) return null;
         return prev.getValue();
     }
 
     public V get(K key)
     {
-        RBTEntry<K,V> found = tree.get(new RBTEntry<>(key, null, false));
+        RedBlackTreeAssociation<K,V> found = tree.get(new RedBlackTreeAssociation<>(key, null, false));
         if(found == null) return null;
         return found.getValue();
     }
@@ -34,7 +34,7 @@ public class RedBlackTreeMap<K extends Comparable<K>,V> {
         return get(key) != null;
     }
 
-    protected void insertRestructure(BinaryTree<RBTEntry<K,V>> node)
+    protected void insertRestructure(BinaryTree<RedBlackTreeAssociation<K,V>> node)
     {
         // case 1 - color the root black
         if(node.parent() == null)
@@ -45,8 +45,8 @@ public class RedBlackTreeMap<K extends Comparable<K>,V> {
         // case 2 - no action taken
         if(!node.parent().value().isRed) return;
         // look for conditions
-        BinaryTree<RBTEntry<K,V>> gp = node.parent().parent();
-        BinaryTree<RBTEntry<K,V>> un = null;
+        BinaryTree<RedBlackTreeAssociation<K,V>> gp = node.parent().parent();
+        BinaryTree<RedBlackTreeAssociation<K,V>> un = null;
         boolean isParentRed = node.parent().value().isRed();
         boolean isUncleRed = false;
         if(gp != null) // node has a grandparent, grab uncle

@@ -2,6 +2,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -33,30 +34,44 @@ public class TreeTranslatorView {
     private TextArea inputTextArea;
     private TextArea outputTextArea;
     private FileChooser fileChooser;
+    private ComboBox<String> treeTypesComboBox;
     /**
-     * Initialize the BinarySearchTree
+     * Splay and RB Trees
      */
-    //private BinarySearchTree<Association<String, String>> myBinarySearchTree = new BinarySearchTree<>();
+    private BSTRedBlackTree<String, String> redBlackDictionary;
+    private BSTSplayTree<String, String> splayDictionary;
     /**
      * Control variables
      */
-    private boolean isDictionaryLoaded, isTextToTranslateLoaded = false;
+    private boolean isDictionaryLoaded, isTextToTranslateLoaded, isSplayTreeSelected = false;
 
     /**
      * Show the stage
      * @param stage the stage to show in the current context
      */
     public void show(Stage stage) {
+
+
         inputTextArea = new TextArea("");
         outputTextArea = new TextArea("...");
         fileChooser = new FileChooser();
 
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text Files", "*.txt")
+                new FileChooser.ExtensionFilter("Text Files", "*.txt, *.dic")
         );
 
         String currentPath = Paths.get(".").toAbsolutePath().normalize().toString();
         fileChooser.setInitialDirectory(new File(currentPath));
+
+        //Init list of trees
+        treeTypesComboBox = new ComboBox<>();
+        treeTypesComboBox.getItems().add(TreeFactory.SPLAY_TREE);
+        treeTypesComboBox.getItems().add(TreeFactory.RED_BLACK_TREE);
+
+        //Initialized as true, cause Splay Tree will be the default tree
+        isSplayTreeSelected = true;
+        treeTypesComboBox.getSelectionModel().selectFirst();
+
 
         BorderPane border = new BorderPane();
         HBox hbox = addHBox(stage);
@@ -169,14 +184,27 @@ public class TreeTranslatorView {
                 String dictionaryContent = "";
 
                 for(Association association: list) dictionaryContent += association.getKey() + "," + association.getValue() + "\n";
-
+                */
                 //Dictionary and/or text haven't been loaded
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Dictionary loaded!");
                 alert.setHeaderText("Your dictionary was loaded...");
-                alert.setContentText("Contains this words:\n" + dictionaryContent);
+                alert.setContentText("Contains a lot of words!\n");
                 alert.showAndWait();
-                */
+            }
+        });
+
+
+        treeTypesComboBox.valueProperty().addListener((obs, oldItem, newItem) -> {
+            if (newItem != null) {
+                switch(newItem){
+                    case TreeFactory.SPLAY_TREE:
+                        isSplayTreeSelected = true;
+                        break;
+                    case TreeFactory.RED_BLACK_TREE:
+                        isSplayTreeSelected = false;
+                        break;
+                }
             }
         });
 
@@ -185,6 +213,10 @@ public class TreeTranslatorView {
         buttonRun.setPrefSize(100, 20);
         buttonRun.setStyle("-fx-background-color: #388e3c;");
         buttonRun.setOnAction(e -> {
+
+            //Initialize trees
+            redBlackDictionary = (BSTRedBlackTree<String, String>) TreeFactory.generateTree(TreeFactory.RED_BLACK_TREE);
+            splayDictionary = (BSTSplayTree<String, String>) TreeFactory.generateTree(TreeFactory.SPLAY_TREE);
 
             if(isTextToTranslateLoaded && isDictionaryLoaded){
                 //Split the inputTextArea by lines and store in an Array

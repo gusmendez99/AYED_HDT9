@@ -1,36 +1,36 @@
-public class SplayTreeMap<K extends Comparable<K>,V>
+public class BSTSplayTree<K extends Comparable<K>,V>
 {
-    protected SplayTree<SplayEntry<K,V>> tree;
+    protected SplayTree<SplayTreeAssociation<K,V>> tree;
 
-    public SplayTreeMap()
+    public BSTSplayTree()
     {
         tree = new SplayTree<>();
     }
 
     public V put(K key, V value)
     {
-        SplayEntry<K,V> old = tree.add(new SplayEntry<>(key, value));
+        SplayTreeAssociation<K,V> old = tree.add(new SplayTreeAssociation<>(key, value));
         if(old == null) return null;
         return old.getValue();
     }
 
     public V remove(K key)
     {
-        SplayEntry<K,V> temp = tree.remove(new SplayEntry<>(key, null));
+        SplayTreeAssociation<K,V> temp = tree.remove(new SplayTreeAssociation<>(key, null));
         if(temp == null) return null;
         return temp.getValue();
     }
 
     public boolean contains(K key)
     {
-        SplayEntry<K,V> temp = tree.get(new SplayEntry<>(key, null));
+        SplayTreeAssociation<K,V> temp = tree.get(new SplayTreeAssociation<>(key, null));
         if(temp == null) return false;
         return temp.getValue() != null;
     }
 
     public V get(K key)
     {
-        SplayEntry<K,V> temp = tree.get(new SplayEntry<>(key, null));
+        SplayTreeAssociation<K,V> temp = tree.get(new SplayTreeAssociation<>(key, null));
         if(temp == null) return null;
         return temp.getValue();
     }

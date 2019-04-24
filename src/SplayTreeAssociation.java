@@ -1,10 +1,11 @@
-import java.util.Map;
+import java.util.Map.Entry;
 
-public class SplayEntry<K extends Comparable<K>,V> implements Map.Entry<K,V>, Comparable<SplayEntry<K, V>> {
+public class SplayTreeAssociation<K extends Comparable<K>,V> implements Entry<K,V>, Comparable<SplayTreeAssociation<K,V>>
+{
     protected K key;
     protected V value;
 
-    public SplayEntry(K k, V v)
+    public SplayTreeAssociation(K k, V v)
     {
         key = k;
         value = v;
@@ -31,7 +32,7 @@ public class SplayEntry<K extends Comparable<K>,V> implements Map.Entry<K,V>, Co
     }
 
     @Override
-    public int compareTo(SplayEntry<K, V> o)
+    public int compareTo(SplayTreeAssociation<K, V> o)
     {
         return key.compareTo(o.getKey());
     }

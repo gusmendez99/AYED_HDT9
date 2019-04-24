@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
-//Code extracted from https://www.geeksforgeeks.org/binary-search-tree-data-structure/
+//Code extracted from http://www.cs.williams.edu/~bailey/JavaStructures2/bailey/structure/BinaryTree.java
 
 /**
  * Class that represents the complete tree of all the possible BinaryTrees, it has operations to alter data of

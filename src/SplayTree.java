@@ -30,8 +30,6 @@ public class SplayTree<E extends Comparable<E>>
     }
 
     /**
-     * Performs a sequence of rotations until the provided node is the root of
-     * the tree.
      * @param node Node to splay.
      * pre: node is not the root of the tree.
      * post: node is the root of the tree.
@@ -48,7 +46,6 @@ public class SplayTree<E extends Comparable<E>>
             p = node.parent();
             if(p != null) gp = p.parent();
             hasGp = gp != null;
-            // <editor-fold defaultstate="collapsed" desc="Node is left child">
             if (node.isLeftChild()) {
                 if (hasGp) // node has a grandparent
                 {
@@ -65,7 +62,7 @@ public class SplayTree<E extends Comparable<E>>
                 {
                     p.rotateRight();
                 }
-            } // </editor-fold>
+            }
             else // node is right child
             {
                 if (hasGp) // node has a grandparent
