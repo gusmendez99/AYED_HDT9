@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -56,17 +57,21 @@ public class TreeTranslatorView {
         outputTextArea = new TextArea("...");
         fileChooser = new FileChooser();
 
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text Files", "*.txt, *.dic")
-        );
-
         String currentPath = Paths.get(".").toAbsolutePath().normalize().toString();
         fileChooser.setInitialDirectory(new File(currentPath));
+
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Select files", "*.txt");
+        fileChooser.getExtensionFilters().add(extFilter);
 
         //Init list of trees
         treeTypesComboBox = new ComboBox<>();
         treeTypesComboBox.getItems().add(TreeFactory.SPLAY_TREE);
         treeTypesComboBox.getItems().add(TreeFactory.RED_BLACK_TREE);
+
+        //Initialize trees
+        redBlackDictionary = (BSTRedBlackTree<String, String>) TreeFactory.generateTree(TreeFactory.RED_BLACK_TREE);
+        splayDictionary = (BSTSplayTree<String, String>) TreeFactory.generateTree(TreeFactory.SPLAY_TREE);
+
 
         //Initialized as true, cause Splay Tree will be the default tree
         isSplayTreeSelected = true;
@@ -147,22 +152,20 @@ public class TreeTranslatorView {
                     bufferedReader = new BufferedReader(new FileReader(selectedFile));
                     String text;
                     while ((text = bufferedReader.readLine()) != null) {
-                       /* if(text.charAt(0) == '(')
-                        {
-                            text = text.substring(1);
+
+                        String temp = text;
+                        temp = temp.replaceAll(",", "\t");
+                        temp = temp.replaceAll(", ", "\t");
+                        temp = temp.replaceAll("; ", "\t");
+                        temp = temp.replaceAll(";", "\t");
+                        if (temp.charAt(0) != '#') {
+                            String[] part = temp.split("\t");
+                            redBlackDictionary.put(part[0], part[1]);
+                            splayDictionary.put(part[0], part[1]);
                         }
-                        if(text.charAt(text.length() - 1) == ')')
-                        {
-                            text = text.substring(0, text.length() - 1);
-                        }
-                        String[] temp = text.split(",");
-                        if(temp.length > 1)
-                        {
-                            //Create a new association with the value of the temp[0] = word in english
-                            //temp[1] = word in spanish
-                            Association<String, String> a = new Association(temp[0], temp[1]);
-                            myBinarySearchTree.add(a);
-                        }*/
+
+
+
                     }
 
                 } catch (FileNotFoundException ex) {
@@ -180,12 +183,8 @@ public class TreeTranslatorView {
                 isDictionaryLoaded = true;
                 //TODO: Show a dialog with successful message, and content
 
-                /*List<Association<String, String>> list = myBinarySearchTree.inOrder();
-                String dictionaryContent = "";
 
-                for(Association association: list) dictionaryContent += association.getKey() + "," + association.getValue() + "\n";
-                */
-                //Dictionary and/or text haven't been loaded
+                //Dictionary and/or text have been loaded
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Dictionary loaded!");
                 alert.setHeaderText("Your dictionary was loaded...");
@@ -213,32 +212,30 @@ public class TreeTranslatorView {
         buttonRun.setPrefSize(100, 20);
         buttonRun.setStyle("-fx-background-color: #388e3c;");
         buttonRun.setOnAction(e -> {
-
-            //Initialize trees
-            redBlackDictionary = (BSTRedBlackTree<String, String>) TreeFactory.generateTree(TreeFactory.RED_BLACK_TREE);
-            splayDictionary = (BSTSplayTree<String, String>) TreeFactory.generateTree(TreeFactory.SPLAY_TREE);
+            outputTextArea.clear();
+            outputTextArea.appendText("Output" + "\n");
 
             if(isTextToTranslateLoaded && isDictionaryLoaded){
                 //Split the inputTextArea by lines and store in an Array
+                //TODO:Check if lowercase
+                //List<String> initLines = Arrays.asList(inputTextArea.getText().toLowerCase().split("\n"));
                 List<String> initLines = Arrays.asList(inputTextArea.getText().split("\n"));
 
+                String tempTranslatedWord;
                 for (String line : initLines) {
                     //TODO: Translate each line in this ArrayList, append to outputTextArea TextArea
                     String[] textToTranslate = line.split(" ");
                     for(String word: textToTranslate)
                     {
-                        //for each word get the association that matches the key
-                        /*
-                        Association<String, String> a = myBinarySearchTree.get(new Association<>(word, null));
-                        if(a != null)
-                        {
-                            //append the association value if exists to the outputTextArea variable
-                            outputTextArea.appendText(a.getValue().toString());
+                        tempTranslatedWord = getTranslatedWord(word);
+                        
+                        if (tempTranslatedWord != null){
+                            outputTextArea.appendText(" "+ tempTranslatedWord);
                         }
-                        else
-                        {
-                            outputTextArea.appendText(" "+ "*" + word + "*" + " ");
-                        }*/
+                        else{
+                            outputTextArea.appendText(" *"+ word +"*");
+                        }
+
                     }
                     outputTextArea.appendText("\n");
 
@@ -249,7 +246,7 @@ public class TreeTranslatorView {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
                 alert.setTitle("Error");
                 alert.setHeaderText("Load files");
-                alert.setContentText("Text to translate or Dictionary haven't been loaded...");
+                alert.setContentText("Text to translate and/or Dictionary haven't been loaded...");
                 alert.showAndWait();
 
             }
@@ -274,9 +271,16 @@ public class TreeTranslatorView {
             isDictionaryLoaded = isTextToTranslateLoaded = false;
         });
 
-        hbox.getChildren().addAll(buttonLoadDictionary, buttonLoadTextToTranslate, buttonClear, buttonRun);
+        hbox.getChildren().addAll(buttonLoadDictionary, buttonLoadTextToTranslate, treeTypesComboBox, buttonClear, buttonRun);
 
         return hbox;
+    }
+
+    private String getTranslatedWord(String word) {
+        if (isSplayTreeSelected)
+            return splayDictionary.get(word);
+        else
+            return redBlackDictionary.get(word);
     }
 
 

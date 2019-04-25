@@ -7,7 +7,7 @@ public class TreeFactory {
     {
         switch(type){
             case SPLAY_TREE:
-                return new SplayTree<>();
+                return new BSTSplayTree<>();
             case RED_BLACK_TREE:
                 return new BSTRedBlackTree<>();
             default:
