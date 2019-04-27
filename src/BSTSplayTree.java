@@ -4,6 +4,7 @@ public class BSTSplayTree<K extends Comparable<K>,V>
 
     public BSTSplayTree()
     {
+
         tree = new SplayTree<>();
     }
 
